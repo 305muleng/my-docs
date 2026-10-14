@@ -1,0 +1,42 @@
+name: Deploy MkDocs to GitHub Pages
+
+# 触发条件：main分支有代码推送，且文档或配置文件发生变化时触发
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/**'
+      - 'mkdocs.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 步骤1：拉取仓库代码
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      # 步骤2：配置Python环境
+      - name: 设置Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # 步骤3：安装MkDocs及主题依赖
+      - name: 安装依赖
+        run: |
+          pip install mkdocs
+          pip install mkdocs-material
+
+      # 步骤4：构建静态文档，生成到site目录
+      - name: 构建静态文档
+        run: mkdocs build
+
+      # 步骤5：将构建产物部署到gh-pages分支
+      - name: 部署到GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages    # 部署目标分支
+          folder: site        # 构建产物所在目录
